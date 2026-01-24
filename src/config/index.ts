@@ -4,15 +4,16 @@
 
 import { existsSync, mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
-import { ConfigSchema, type Config, type LogLevel } from './schema.js';
+import { ConfigSchema, type Config, type LogLevel, type StorageMode } from './schema.js';
 
-export { ConfigSchema, type Config, type LogLevel };
+export { ConfigSchema, type Config, type LogLevel, type StorageMode };
 export {
   DEFAULT_DATA_DIR,
   DEFAULT_DB_PATH,
   DEFAULT_LOG_LEVEL,
   DEFAULT_SERVER_NAME,
   DEFAULT_SERVER_VERSION,
+  DEFAULT_SUPABASE_URL,
 } from './defaults.js';
 
 /**
@@ -24,12 +25,20 @@ let currentConfig: Config | null = null;
  * Load configuration from environment variables.
  */
 export function loadConfig(overrides: Partial<Config> = {}): Config {
+  // Determine mode from environment or presence of API key
+  const apiKey = process.env.CONTEXTABLE_API_KEY;
+  const defaultMode = apiKey ? 'hosted' : 'local';
+
   const envConfig = {
+    mode: (process.env.CONTEXTABLE_MODE as StorageMode | undefined) ?? defaultMode,
     dataDir: process.env.CONTEXTABLE_DATA_DIR,
     dbPath: process.env.CONTEXTABLE_DB_PATH,
     logLevel: process.env.CONTEXTABLE_LOG_LEVEL as LogLevel | undefined,
     serverName: process.env.CONTEXTABLE_SERVER_NAME,
     serverVersion: process.env.CONTEXTABLE_SERVER_VERSION,
+    supabaseUrl: process.env.CONTEXTABLE_API_URL || process.env.SUPABASE_URL,
+    supabaseServiceKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
+    apiKey: apiKey,
   };
 
   // Filter out undefined values

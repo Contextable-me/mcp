@@ -9,6 +9,7 @@ import {
   DEFAULT_LOG_LEVEL,
   DEFAULT_SERVER_NAME,
   DEFAULT_SERVER_VERSION,
+  DEFAULT_SUPABASE_URL,
 } from './defaults.js';
 
 /**
@@ -18,16 +19,27 @@ export const LogLevelSchema = z.enum(['debug', 'info', 'warn', 'error']);
 export type LogLevel = z.infer<typeof LogLevelSchema>;
 
 /**
+ * Storage mode schema.
+ */
+export const StorageModeSchema = z.enum(['local', 'hosted']);
+export type StorageMode = z.infer<typeof StorageModeSchema>;
+
+/**
  * Configuration schema.
  */
 export const ConfigSchema = z.object({
   /**
-   * Data directory path.
+   * Storage mode: 'local' for SQLite, 'hosted' for Supabase.
+   */
+  mode: StorageModeSchema.default('local'),
+
+  /**
+   * Data directory path (local mode only).
    */
   dataDir: z.string().default(DEFAULT_DATA_DIR),
 
   /**
-   * Database file path.
+   * Database file path (local mode only).
    */
   dbPath: z.string().default(DEFAULT_DB_PATH),
 
@@ -45,6 +57,22 @@ export const ConfigSchema = z.object({
    * Server version.
    */
   serverVersion: z.string().default(DEFAULT_SERVER_VERSION),
+
+  /**
+   * Supabase URL (hosted mode only).
+   */
+  supabaseUrl: z.string().default(DEFAULT_SUPABASE_URL),
+
+  /**
+   * Supabase service role key (hosted mode only).
+   * Required for API key validation.
+   */
+  supabaseServiceKey: z.string().optional(),
+
+  /**
+   * API key for authentication (hosted mode only).
+   */
+  apiKey: z.string().optional(),
 });
 
 export type Config = z.infer<typeof ConfigSchema>;

@@ -6,6 +6,12 @@
 
 // Storage
 export { SQLiteAdapter, type SQLiteAdapterOptions } from './storage/index.js';
+export {
+  SupabaseAdapter,
+  type SupabaseAdapterOptions,
+  validateApiKey,
+  hashApiKey,
+} from './storage/index.js';
 export type {
   StorageAdapter,
   ProjectStorage,
@@ -79,7 +85,14 @@ export {
 } from './tools/index.js';
 
 // Server
-export { createServer, runServer, registerTools, TOOL_DEFINITIONS } from './server/index.js';
+export {
+  createServer,
+  runServer,
+  registerTools,
+  TOOL_DEFINITIONS,
+  createHttpMcpServer,
+  type HttpServerOptions,
+} from './server/index.js';
 
 // Config
 export {
@@ -89,11 +102,13 @@ export {
   logger,
   type Config,
   type LogLevel,
+  type StorageMode,
   DEFAULT_DATA_DIR,
   DEFAULT_DB_PATH,
   DEFAULT_LOG_LEVEL,
   DEFAULT_SERVER_NAME,
   DEFAULT_SERVER_VERSION,
+  DEFAULT_SUPABASE_URL,
 } from './config/index.js';
 
 // Utils

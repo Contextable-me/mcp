@@ -23,4 +23,8 @@ export const DEFAULT_SERVER_NAME = 'contextable-mcp';
  * Default server version.
  */
 export const DEFAULT_SERVER_VERSION = '0.1.0';
+/**
+ * Default Supabase URL for hosted mode.
+ */
+export const DEFAULT_SUPABASE_URL = 'https://api.contextable.me';
 //# sourceMappingURL=defaults.js.map

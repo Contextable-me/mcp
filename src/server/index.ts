@@ -1,34 +1,66 @@
 /**
  * MCP Server implementation.
+ *
+ * Supports two storage modes:
+ * - local: SQLite database at ~/.contextable/data.db
+ * - hosted: Supabase cloud storage with API key authentication
  */
 
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { SQLiteAdapter } from '../storage/index.js';
+import { SQLiteAdapter, SupabaseAdapter, type StorageAdapter } from '../storage/index.js';
 import { getConfig, ensureDataDir, logger, type Config } from '../config/index.js';
 import { registerTools } from './tools.js';
 
 export { registerTools, TOOL_DEFINITIONS } from './tools.js';
+export { createHttpMcpServer, type HttpServerOptions } from './http.js';
+
+/**
+ * Create storage adapter based on configuration mode.
+ */
+async function createStorage(config: Config): Promise<StorageAdapter> {
+  if (config.mode === 'hosted') {
+    // Hosted mode: use Supabase
+    if (!config.apiKey) {
+      throw new Error('API key is required for hosted mode. Set CONTEXTABLE_API_KEY.');
+    }
+    if (!config.supabaseServiceKey) {
+      throw new Error('Supabase service key is required for hosted mode.');
+    }
+
+    logger.info(`Connecting to hosted storage at ${config.supabaseUrl}`);
+    const storage = new SupabaseAdapter({
+      supabaseUrl: config.supabaseUrl,
+      supabaseServiceKey: config.supabaseServiceKey,
+      apiKey: config.apiKey,
+    });
+    await storage.initialize();
+    logger.info(`Authenticated as user ${storage.getUserId()}`);
+    return storage;
+  } else {
+    // Local mode: use SQLite
+    ensureDataDir(config);
+    logger.info(`Initializing local storage at ${config.dbPath}`);
+    const storage = new SQLiteAdapter({ path: config.dbPath });
+    await storage.initialize();
+    return storage;
+  }
+}
 
 /**
  * Create and configure the MCP server.
  */
 export async function createServer(config?: Partial<Config>): Promise<{
   server: Server;
-  storage: SQLiteAdapter;
+  storage: StorageAdapter;
   start: () => Promise<void>;
   close: () => Promise<void>;
 }> {
   const cfg = getConfig();
   const finalConfig = { ...cfg, ...config };
 
-  // Ensure data directory exists
-  ensureDataDir(finalConfig);
-
-  // Initialize storage
-  logger.info(`Initializing storage at ${finalConfig.dbPath}`);
-  const storage = new SQLiteAdapter({ path: finalConfig.dbPath });
-  await storage.initialize();
+  // Initialize storage based on mode
+  const storage = await createStorage(finalConfig);
 
   // Create MCP server
   const server = new Server(
@@ -53,7 +85,7 @@ export async function createServer(config?: Partial<Config>): Promise<{
     server,
     storage,
     start: async () => {
-      logger.info(`Starting ${finalConfig.serverName} v${finalConfig.serverVersion}`);
+      logger.info(`Starting ${finalConfig.serverName} v${finalConfig.serverVersion} (${finalConfig.mode} mode)`);
       await server.connect(transport);
       logger.info('Server connected via stdio');
     },

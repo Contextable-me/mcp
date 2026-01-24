@@ -1,9 +1,9 @@
 /**
  * Configuration management.
  */
-import { ConfigSchema, type Config, type LogLevel } from './schema.js';
-export { ConfigSchema, type Config, type LogLevel };
-export { DEFAULT_DATA_DIR, DEFAULT_DB_PATH, DEFAULT_LOG_LEVEL, DEFAULT_SERVER_NAME, DEFAULT_SERVER_VERSION, } from './defaults.js';
+import { ConfigSchema, type Config, type LogLevel, type StorageMode } from './schema.js';
+export { ConfigSchema, type Config, type LogLevel, type StorageMode };
+export { DEFAULT_DATA_DIR, DEFAULT_DB_PATH, DEFAULT_LOG_LEVEL, DEFAULT_SERVER_NAME, DEFAULT_SERVER_VERSION, DEFAULT_SUPABASE_URL, } from './defaults.js';
 /**
  * Load configuration from environment variables.
  */

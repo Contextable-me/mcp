@@ -5,7 +5,7 @@ import { existsSync, mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { ConfigSchema } from './schema.js';
 export { ConfigSchema };
-export { DEFAULT_DATA_DIR, DEFAULT_DB_PATH, DEFAULT_LOG_LEVEL, DEFAULT_SERVER_NAME, DEFAULT_SERVER_VERSION, } from './defaults.js';
+export { DEFAULT_DATA_DIR, DEFAULT_DB_PATH, DEFAULT_LOG_LEVEL, DEFAULT_SERVER_NAME, DEFAULT_SERVER_VERSION, DEFAULT_SUPABASE_URL, } from './defaults.js';
 /**
  * Current configuration.
  */
@@ -14,12 +14,19 @@ let currentConfig = null;
  * Load configuration from environment variables.
  */
 export function loadConfig(overrides = {}) {
+    // Determine mode from environment or presence of API key
+    const apiKey = process.env.CONTEXTABLE_API_KEY;
+    const defaultMode = apiKey ? 'hosted' : 'local';
     const envConfig = {
+        mode: process.env.CONTEXTABLE_MODE ?? defaultMode,
         dataDir: process.env.CONTEXTABLE_DATA_DIR,
         dbPath: process.env.CONTEXTABLE_DB_PATH,
         logLevel: process.env.CONTEXTABLE_LOG_LEVEL,
         serverName: process.env.CONTEXTABLE_SERVER_NAME,
         serverVersion: process.env.CONTEXTABLE_SERVER_VERSION,
+        supabaseUrl: process.env.CONTEXTABLE_API_URL || process.env.SUPABASE_URL,
+        supabaseServiceKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
+        apiKey: apiKey,
     };
     // Filter out undefined values
     const filtered = Object.fromEntries(Object.entries({ ...envConfig, ...overrides }).filter(([, v]) => v !== undefined));
