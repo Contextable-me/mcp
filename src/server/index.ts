@@ -70,7 +70,9 @@ export async function createServer(config?: Partial<Config>): Promise<{
     },
     {
       capabilities: {
-        tools: {},
+        tools: {
+          listChanged: true,
+        },
       },
     }
   );
