@@ -54,6 +54,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/contextable/mcp.git"
-  }
+    "url": "https://github.com/Contextable-me/mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Contextable-me/mcp/issues"
+  },
+  "homepage": "https://github.com/Contextable-me/mcp#readme"
 }
