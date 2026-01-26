@@ -55,7 +55,7 @@ export async function createHttpMcpServer(options: HttpServerOptions): Promise<{
   close: () => Promise<void>;
 }> {
   const port = options.port ?? 3000;
-  const host = options.host ?? '127.0.0.1';
+  const host = options.host ?? '0.0.0.0';
 
   // Create HTTP server
   const httpServer = createHttpServer(async (req, res) => {
