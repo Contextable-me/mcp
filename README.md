@@ -1,87 +1,13 @@
 # @contextable/mcp
 
-MCP (Model Context Protocol) server for AI memory. Store and retrieve context across AI conversations.
+Give your AI a memory. Works with Claude Desktop and any MCP-compatible client.
 
-## Features
+## Quick Start (30 seconds)
 
-- **Dual Transport Modes**: Stdio (for Claude Desktop) or HTTP/SSE (for web clients)
-- **Dual Storage Modes**: Local SQLite or hosted Supabase cloud storage
-- **Full-Text Search**: FTS5-powered search across all artifacts
-- **Version History**: Automatic versioning with rollback support
-- **Auto-Chunking**: Large content automatically split into manageable parts
-- **Topic Clustering**: Automatic topic detection and filtering
-- **Living Summaries**: Auto-generated project status summaries
+Add to your Claude Desktop config:
 
-## Installation
-
-```bash
-npm install -g @contextable/mcp
-```
-
-Or run directly:
-
-```bash
-npx @contextable/mcp
-```
-
-## Storage Modes
-
-### Local Mode (Default)
-
-Uses SQLite database stored locally at `~/.contextable/data.db`. Your data stays on your machine.
-
-```bash
-npx @contextable/mcp
-# or explicitly:
-npx @contextable/mcp --local
-```
-
-### Hosted Mode
-
-Connects to the Contextable cloud service for synced storage across devices.
-
-```bash
-# Set your API key
-export CONTEXTABLE_API_KEY=ctx_your_api_key_here
-
-# Run in hosted mode
-npx @contextable/mcp --hosted
-```
-
-Get your API key at: https://contextable.me/settings
-
-## Transport Modes
-
-### Stdio (Default)
-
-Uses standard input/output for communication. This is the default mode and works with Claude Desktop.
-
-```bash
-npx @contextable/mcp
-```
-
-### HTTP/SSE
-
-Uses HTTP with Server-Sent Events for communication. This mode enables web-based clients to connect.
-
-```bash
-# Start HTTP server on default port 3000
-npx @contextable/mcp --sse
-
-# Custom port and host
-npx @contextable/mcp --sse --port=8080 --host=0.0.0.0
-```
-
-The HTTP server provides:
-- `GET /health` - Health check endpoint
-- `POST /mcp` - MCP message endpoint
-- `GET /mcp` - SSE stream for server-to-client messages
-
-## Usage with Claude Desktop
-
-Add to your Claude Desktop configuration (`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
-
-### Local Mode
+**macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+**Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
 
 ```json
 {
@@ -94,128 +20,153 @@ Add to your Claude Desktop configuration (`~/Library/Application Support/Claude/
 }
 ```
 
-### Hosted Mode
+Restart Claude Desktop. Done.
+
+Now ask Claude: *"Create a project called My App to track my development decisions"*
+
+## What You Can Do
+
+**Save context that persists across conversations:**
+
+- *"Save this architecture decision to the project"*
+- *"Remember this API design for later"*
+- *"Store this bug investigation so I don't forget"*
+
+**Find anything instantly:**
+
+- *"Search for authentication"*
+- *"What did we decide about the database?"*
+- *"Load all security-related artifacts"*
+
+**Pick up where you left off:**
+
+- *"Resume my project"*
+- *"Show me the project summary"*
+- *"What were we working on?"*
+
+## Features
+
+| Feature | Description |
+|---------|-------------|
+| **Projects** | Organize context by project or topic |
+| **Artifacts** | Save decisions, code snippets, docs, conversations |
+| **Full-Text Search** | Find anything across all projects |
+| **Version History** | Every change tracked, rollback anytime |
+| **Auto-Chunking** | Large content automatically split |
+| **Topic Clustering** | Auto-detect themes across artifacts |
+
+## All 13 Tools
+
+### Projects
+- `project_save` - Create or update a project
+- `project_list` - List all projects
+- `project_resume` - Load project with summaries
+- `project_analysis_get` - Get AI-generated insights
+
+### Artifacts
+- `artifact_save` - Save content (auto-chunks large files)
+- `artifact_list` - List with size estimates
+- `artifact_get` - Load full content
+- `artifact_delete` - Archive (recoverable)
+- `artifact_restore` - Restore archived
+- `artifact_archived` - List archived items
+- `artifact_versions` - View history
+- `artifact_rollback` - Restore previous version
+
+### Search
+- `search` - Full-text search across everything
+
+## Your Data
+
+Everything is stored locally in SQLite:
+
+```
+~/.contextable/data.db
+```
+
+No account. No cloud. No tracking. Your data stays on your machine.
+
+---
+
+## Want More?
+
+**[Contextable Cloud](https://contextable.me)** adds:
+
+| Feature | Local | Cloud |
+|---------|:-----:|:-----:|
+| Claude Desktop | ✓ | ✓ |
+| ChatGPT | - | ✓ |
+| Claude.ai (web) | - | ✓ |
+| Sync across devices | - | ✓ |
+| AI analysis & insights | - | ✓ |
+| Team sharing | - | Coming soon |
+
+**[Try Contextable Cloud →](https://contextable.me)**
+
+---
+
+## Configuration
+
+### Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `CONTEXTABLE_DATA_DIR` | `~/.contextable` | Data directory |
+| `CONTEXTABLE_DB_PATH` | `~/.contextable/data.db` | SQLite database path |
+| `CONTEXTABLE_LOG_LEVEL` | `info` | Logging: debug, info, warn, error |
+
+### Custom Database Location
 
 ```json
 {
   "mcpServers": {
     "contextable": {
       "command": "npx",
-      "args": ["@contextable/mcp", "--hosted"],
+      "args": ["@contextable/mcp"],
       "env": {
-        "CONTEXTABLE_API_KEY": "ctx_your_api_key_here"
+        "CONTEXTABLE_DB_PATH": "/path/to/my/data.db"
       }
     }
   }
 }
 ```
 
-## Tools
+### HTTP Mode (Advanced)
 
-### Project Management
+For web-based MCP clients, run as HTTP server:
 
-- **project_save** - Create or update a project
-- **project_list** - List all projects
-- **project_resume** - Load a project with artifact summaries
-- **project_analysis_get** - Get cached AI analysis results
-
-### Artifact Management
-
-- **artifact_save** - Save content to a project (auto-chunks large content)
-- **artifact_list** - List artifacts with size estimates
-- **artifact_get** - Load full artifact content
-- **artifact_delete** - Archive an artifact
-- **artifact_restore** - Restore an archived artifact
-- **artifact_archived** - List archived artifacts
-- **artifact_versions** - Get version history
-- **artifact_rollback** - Rollback to previous version
-
-### Search
-
-- **search** - Full-text search across all artifacts
-
-## Environment Variables
-
-### General
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `CONTEXTABLE_MODE` | `local` | Storage mode: `local` or `hosted` |
-| `CONTEXTABLE_LOG_LEVEL` | `info` | Log level: debug, info, warn, error |
-
-### Local Mode
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `CONTEXTABLE_DATA_DIR` | `~/.contextable` | Data directory |
-| `CONTEXTABLE_DB_PATH` | `~/.contextable/data.db` | Database path |
-
-### Hosted Mode
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `CONTEXTABLE_API_KEY` | - | Your API key (required for hosted mode) |
-| `CONTEXTABLE_API_URL` | `https://api.contextable.me` | API URL |
-
-### HTTP/SSE Transport
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `CONTEXTABLE_PORT` | `3000` | HTTP server port |
-| `CONTEXTABLE_HOST` | `127.0.0.1` | HTTP server host |
-
-## Example Usage
-
-Once configured, you can ask Claude to:
-
-- "Create a project called 'My App' for tracking my mobile app development"
-- "Save this design decision to the project"
-- "Search for authentication-related content"
-- "Show me the project summary"
-- "Load all security-related artifacts"
-
-## API
-
-The package exports types and functions for programmatic use:
-
-### Local Storage (SQLite)
-
-```typescript
-import { SQLiteAdapter, projectSave, artifactGet, search } from '@contextable/mcp';
-
-// Create local storage
-const storage = new SQLiteAdapter({ path: './my-data.db' });
-await storage.initialize();
-
-// Use tools
-const ctx = { storage };
-const result = await projectSave(ctx, {
-  name: 'My Project',
-  description: 'A test project',
-});
-
-await storage.close();
+```bash
+npx @contextable/mcp --sse --port 3000
 ```
 
-### Hosted Storage (Supabase)
+Endpoints:
+- `GET /health` - Health check
+- `POST /mcp` - MCP messages (JSON-RPC)
+
+## Programmatic Usage
 
 ```typescript
-import { SupabaseAdapter, projectSave } from '@contextable/mcp';
+import { SQLiteAdapter } from '@contextable/mcp';
 
-// Create hosted storage
-const storage = new SupabaseAdapter({
-  supabaseUrl: 'https://api.contextable.me',
-  supabaseServiceKey: process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  apiKey: process.env.CONTEXTABLE_API_KEY!,
-});
+const storage = new SQLiteAdapter({ path: './my-context.db' });
 await storage.initialize();
 
-// Use tools - same API as local mode
-const ctx = { storage };
-const result = await projectSave(ctx, {
+// Create a project
+const project = await storage.createProject({
   name: 'My Project',
-  description: 'A test project',
+  description: 'Project description',
 });
+
+// Save an artifact
+const artifact = await storage.createArtifact({
+  projectId: project.id,
+  title: 'Design Decision',
+  artifactType: 'decision',
+  content: '# We chose PostgreSQL because...',
+});
+
+// Search
+const results = await storage.search('postgresql');
 
 await storage.close();
 ```
@@ -223,28 +174,20 @@ await storage.close();
 ## Development
 
 ```bash
-# Install dependencies
+git clone https://github.com/Contextable-me/mcp.git
+cd mcp
 npm install
-
-# Build
 npm run build
-
-# Run tests
 npm test
-
-# Type check
-npm run typecheck
 ```
 
 ## License
 
-Apache 2.0 - See [LICENSE](LICENSE) for details.
-
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Apache 2.0 - See [LICENSE](LICENSE)
 
 ## Links
 
-- [Contextable](https://contextable.me) - Hosted version with advanced features
-- [MCP Protocol](https://modelcontextprotocol.io) - Model Context Protocol specification
+- **[Contextable Cloud](https://contextable.me)** - Sync, ChatGPT, AI analysis
+- **[GitHub](https://github.com/Contextable-me/mcp)** - Source code
+- **[MCP Protocol](https://modelcontextprotocol.io)** - Specification
+- **[npm](https://www.npmjs.com/package/@contextable/mcp)** - Package
