@@ -44,6 +44,12 @@ Now ask Claude: *"Create a project called My App to track my development decisio
 - *"Show me the project summary"*
 - *"What were we working on?"*
 
+**Import your chat history (NEW):**
+
+- *"Analyze my ChatGPT export at ~/Downloads/chatgpt-export.zip"*
+- *"Import the 'React Development' project from my chat history"*
+- *"What projects can you detect from my Claude conversations?"*
+
 ## Features
 
 | Feature | Description |
@@ -54,8 +60,9 @@ Now ask Claude: *"Create a project called My App to track my development decisio
 | **Version History** | Every change tracked, rollback anytime |
 | **Auto-Chunking** | Large content automatically split |
 | **Topic Clustering** | Auto-detect themes across artifacts |
+| **Chat Import** | Import from ChatGPT, Claude, Gemini exports |
 
-## All 13 Tools
+## All 15 Tools
 
 ### Projects
 - `project_save` - Create or update a project
@@ -75,6 +82,10 @@ Now ask Claude: *"Create a project called My App to track my development decisio
 
 ### Search
 - `search` - Full-text search across everything
+
+### Import (NEW in v0.2.0)
+- `import_analyze` - Analyze chat exports from ChatGPT, Claude, or Gemini
+- `import_seed` - Create projects from analyzed chat history
 
 ## Your Data
 
