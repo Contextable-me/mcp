@@ -57,7 +57,9 @@ export async function createServer(config) {
         version: finalConfig.serverVersion,
     }, {
         capabilities: {
-            tools: {},
+            tools: {
+                listChanged: true,
+            },
         },
     });
     // Register tools

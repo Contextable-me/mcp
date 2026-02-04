@@ -50,6 +50,10 @@ export declare const TOOL_DEFINITIONS: ({
             max_content_length?: undefined;
             version_id?: undefined;
             query?: undefined;
+            file_path?: undefined;
+            project_names?: undefined;
+            create_context_artifacts?: undefined;
+            include_decisions?: undefined;
         };
         required: string[];
     };
@@ -92,6 +96,10 @@ export declare const TOOL_DEFINITIONS: ({
             max_content_length?: undefined;
             version_id?: undefined;
             query?: undefined;
+            file_path?: undefined;
+            project_names?: undefined;
+            create_context_artifacts?: undefined;
+            include_decisions?: undefined;
         };
         required?: undefined;
     };
@@ -145,6 +153,10 @@ export declare const TOOL_DEFINITIONS: ({
             max_content_length?: undefined;
             version_id?: undefined;
             query?: undefined;
+            file_path?: undefined;
+            project_names?: undefined;
+            create_context_artifacts?: undefined;
+            include_decisions?: undefined;
         };
         required?: undefined;
     };
@@ -187,6 +199,10 @@ export declare const TOOL_DEFINITIONS: ({
             max_content_length?: undefined;
             version_id?: undefined;
             query?: undefined;
+            file_path?: undefined;
+            project_names?: undefined;
+            create_context_artifacts?: undefined;
+            include_decisions?: undefined;
         };
         required?: undefined;
     };
@@ -251,6 +267,10 @@ export declare const TOOL_DEFINITIONS: ({
             max_content_length?: undefined;
             version_id?: undefined;
             query?: undefined;
+            file_path?: undefined;
+            project_names?: undefined;
+            create_context_artifacts?: undefined;
+            include_decisions?: undefined;
         };
         required: string[];
     };
@@ -296,6 +316,10 @@ export declare const TOOL_DEFINITIONS: ({
             max_content_length?: undefined;
             version_id?: undefined;
             query?: undefined;
+            file_path?: undefined;
+            project_names?: undefined;
+            create_context_artifacts?: undefined;
+            include_decisions?: undefined;
         };
         required: string[];
     };
@@ -334,6 +358,10 @@ export declare const TOOL_DEFINITIONS: ({
             auto_chunk?: undefined;
             version_id?: undefined;
             query?: undefined;
+            file_path?: undefined;
+            project_names?: undefined;
+            create_context_artifacts?: undefined;
+            include_decisions?: undefined;
         };
         required: string[];
     };
@@ -369,6 +397,10 @@ export declare const TOOL_DEFINITIONS: ({
             max_content_length?: undefined;
             version_id?: undefined;
             query?: undefined;
+            file_path?: undefined;
+            project_names?: undefined;
+            create_context_artifacts?: undefined;
+            include_decisions?: undefined;
         };
         required: string[];
     };
@@ -407,6 +439,10 @@ export declare const TOOL_DEFINITIONS: ({
             max_content_length?: undefined;
             version_id?: undefined;
             query?: undefined;
+            file_path?: undefined;
+            project_names?: undefined;
+            create_context_artifacts?: undefined;
+            include_decisions?: undefined;
         };
         required: string[];
     };
@@ -445,6 +481,10 @@ export declare const TOOL_DEFINITIONS: ({
             max_content_length?: undefined;
             version_id?: undefined;
             query?: undefined;
+            file_path?: undefined;
+            project_names?: undefined;
+            create_context_artifacts?: undefined;
+            include_decisions?: undefined;
         };
         required: string[];
     };
@@ -483,6 +523,10 @@ export declare const TOOL_DEFINITIONS: ({
             auto_chunk?: undefined;
             max_content_length?: undefined;
             query?: undefined;
+            file_path?: undefined;
+            project_names?: undefined;
+            create_context_artifacts?: undefined;
+            include_decisions?: undefined;
         };
         required: string[];
     };
@@ -524,6 +568,100 @@ export declare const TOOL_DEFINITIONS: ({
             artifact_id?: undefined;
             max_content_length?: undefined;
             version_id?: undefined;
+            file_path?: undefined;
+            project_names?: undefined;
+            create_context_artifacts?: undefined;
+            include_decisions?: undefined;
+        };
+        required: string[];
+    };
+} | {
+    name: string;
+    description: string;
+    inputSchema: {
+        type: "object";
+        properties: {
+            file_path: {
+                type: string;
+                description: string;
+            };
+            name?: undefined;
+            description?: undefined;
+            tags?: undefined;
+            config?: undefined;
+            status?: undefined;
+            limit?: undefined;
+            offset?: undefined;
+            project_id?: undefined;
+            project_name?: undefined;
+            load_content?: undefined;
+            max_tokens?: undefined;
+            priority_filter?: undefined;
+            topic_cluster?: undefined;
+            analysis_type?: undefined;
+            artifact_type?: undefined;
+            content?: undefined;
+            summary?: undefined;
+            priority?: undefined;
+            auto_chunk?: undefined;
+            artifact_id?: undefined;
+            max_content_length?: undefined;
+            version_id?: undefined;
+            query?: undefined;
+            project_names?: undefined;
+            create_context_artifacts?: undefined;
+            include_decisions?: undefined;
+        };
+        required: string[];
+    };
+} | {
+    name: string;
+    description: string;
+    inputSchema: {
+        type: "object";
+        properties: {
+            file_path: {
+                type: string;
+                description: string;
+            };
+            project_names: {
+                type: string;
+                items: {
+                    type: string;
+                };
+                description: string;
+            };
+            create_context_artifacts: {
+                type: string;
+                description: string;
+            };
+            include_decisions: {
+                type: string;
+                description: string;
+            };
+            name?: undefined;
+            description?: undefined;
+            tags?: undefined;
+            config?: undefined;
+            status?: undefined;
+            limit?: undefined;
+            offset?: undefined;
+            project_id?: undefined;
+            project_name?: undefined;
+            load_content?: undefined;
+            max_tokens?: undefined;
+            priority_filter?: undefined;
+            topic_cluster?: undefined;
+            analysis_type?: undefined;
+            artifact_type?: undefined;
+            content?: undefined;
+            summary?: undefined;
+            priority?: undefined;
+            auto_chunk?: undefined;
+            artifact_id?: undefined;
+            max_content_length?: undefined;
+            version_id?: undefined;
+            query?: undefined;
         };
         required: string[];
     };

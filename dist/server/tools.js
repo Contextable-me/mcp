@@ -2,7 +2,7 @@
  * Tool registration for the MCP server.
  */
 import { ListToolsRequestSchema, CallToolRequestSchema } from '@modelcontextprotocol/sdk/types.js';
-import { projectSave, projectList, projectResume, projectAnalysisGet, artifactSave, artifactList, artifactGet, artifactDelete, artifactRestore, artifactArchived, artifactVersions, artifactRollback, search, } from '../tools/index.js';
+import { projectSave, projectList, projectResume, projectAnalysisGet, artifactSave, artifactList, artifactGet, artifactDelete, artifactRestore, artifactArchived, artifactVersions, artifactRollback, search, importAnalyze, importSeed, } from '../tools/index.js';
 /**
  * Tool definitions for MCP.
  */
@@ -280,6 +280,69 @@ something when you don't remember which project it's in.`,
             required: ['query'],
         },
     },
+    {
+        name: 'import_analyze',
+        description: `Analyze a chat export file without importing.
+
+Parses a ZIP file exported from ChatGPT, Claude, or Gemini and returns:
+- Detected topics and patterns in your conversations
+- Suggested projects to create based on conversation clusters
+- Key decisions you've made
+- Statistics about your chat history
+
+All processing happens locally - your data never leaves your device.
+
+USAGE:
+1. Export your chat history from ChatGPT/Claude/Gemini
+2. Provide the path to the ZIP file
+3. Review the analysis to see suggested projects
+4. Use import_seed to create the projects you want`,
+        inputSchema: {
+            type: 'object',
+            properties: {
+                file_path: {
+                    type: 'string',
+                    description: 'Absolute path to the exported ZIP file (e.g., /Users/you/Downloads/chatgpt-export.zip)',
+                },
+            },
+            required: ['file_path'],
+        },
+    },
+    {
+        name: 'import_seed',
+        description: `Import selected projects from a chat export.
+
+After running import_analyze, use this to create the projects you want.
+Each project will include:
+- A context artifact summarizing the imported conversations
+- Key decisions extracted from the conversations
+- Any suggested artifacts (code snippets, documents, etc.)
+
+All processing happens locally - your data stays on your device.`,
+        inputSchema: {
+            type: 'object',
+            properties: {
+                file_path: {
+                    type: 'string',
+                    description: 'Path to the ZIP file (same as used in import_analyze)',
+                },
+                project_names: {
+                    type: 'array',
+                    items: { type: 'string' },
+                    description: 'Names of projects to import (from detected_projects in analysis)',
+                },
+                create_context_artifacts: {
+                    type: 'boolean',
+                    description: 'Create context artifacts with conversation summaries (default: true)',
+                },
+                include_decisions: {
+                    type: 'boolean',
+                    description: 'Include detected decisions as artifacts (default: true)',
+                },
+            },
+            required: ['file_path', 'project_names'],
+        },
+    },
 ];
 /**
  * Tool handlers map.
@@ -298,6 +361,8 @@ const TOOL_HANDLERS = {
     artifact_versions: (ctx, params) => artifactVersions(ctx, params),
     artifact_rollback: (ctx, params) => artifactRollback(ctx, params),
     search: (ctx, params) => search(ctx, params),
+    import_analyze: (ctx, params) => importAnalyze(ctx, params),
+    import_seed: (ctx, params) => importSeed(ctx, params),
 };
 /**
  * Register all tools with the MCP server.

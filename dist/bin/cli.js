@@ -149,7 +149,7 @@ For more information, visit: https://contextable.me
             // HTTP/SSE mode
             const storage = await createStorage(config);
             const port = portArg ? parseInt(portArg, 10) : 3000;
-            const host = hostArg || '127.0.0.1';
+            const host = hostArg || '0.0.0.0';
             const { start, close } = await createHttpMcpServer({
                 port,
                 host,

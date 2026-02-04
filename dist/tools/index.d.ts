@@ -10,4 +10,5 @@ export type { ToolContext } from './projects.js';
 export { projectSave, projectList, projectResume, projectAnalysisGet } from './projects.js';
 export { artifactSave, artifactList, artifactGet, artifactDelete, artifactRestore, artifactArchived, artifactVersions, artifactRollback, } from './artifacts.js';
 export { search } from './search.js';
+export { importAnalyze, importSeed } from './import.js';
 //# sourceMappingURL=index.d.ts.map

@@ -1,0 +1,1 @@
+{"version":3,"file":"chatgpt.d.ts","sourceRoot":"","sources":["../../../src/import/parsers/chatgpt.ts"],"names":[],"mappings":"AAAA;;;;;;;;;;;;;GAaG;AAEH,OAAO,KAAK,EACV,YAAY,EAIb,MAAM,aAAa,CAAC;AAqCrB;;GAEG;AACH,wBAAgB,aAAa,CAAC,KAAK,EAAE,GAAG,CAAC,MAAM,EAAE,MAAM,CAAC,GAAG,OAAO,CAajE;AAED;;GAEG;AACH,wBAAgB,YAAY,CAAC,KAAK,EAAE,GAAG,CAAC,MAAM,EAAE,MAAM,CAAC,GAAG,YAAY,CA8CrE"}

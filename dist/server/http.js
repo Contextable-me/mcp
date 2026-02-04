@@ -7,7 +7,6 @@
 import { createServer as createHttpServer } from 'node:http';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
-import { randomUUID } from 'node:crypto';
 import { logger } from '../config/index.js';
 import { registerTools } from './tools.js';
 /**
@@ -39,18 +38,18 @@ async function parseBody(req) {
  */
 export async function createHttpMcpServer(options) {
     const port = options.port ?? 3000;
-    const host = options.host ?? '127.0.0.1';
-    // Track active transports by session ID
-    const transports = new Map();
+    const host = options.host ?? '0.0.0.0';
     // Create HTTP server
     const httpServer = createHttpServer(async (req, res) => {
         const url = new URL(req.url ?? '/', `http://${host}:${port}`);
+        console.log(`[HTTP] ${req.method} ${url.pathname} from ${req.headers.origin || 'unknown origin'}`);
         // Handle CORS preflight for all routes
         if (req.method === 'OPTIONS') {
             res.writeHead(204, {
                 'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-                'Access-Control-Allow-Headers': 'Content-Type, mcp-session-id',
+                'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type, Accept, mcp-session-id',
+                'Access-Control-Expose-Headers': 'mcp-session-id',
                 'Access-Control-Max-Age': '86400',
             });
             res.end();
@@ -58,7 +57,9 @@ export async function createHttpMcpServer(options) {
         }
         // Add CORS headers to all responses
         res.setHeader('Access-Control-Allow-Origin', '*');
-        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, mcp-session-id');
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept, mcp-session-id');
+        res.setHeader('Access-Control-Expose-Headers', 'mcp-session-id');
         // Health check endpoint
         if (url.pathname === '/health' && req.method === 'GET') {
             res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -67,59 +68,34 @@ export async function createHttpMcpServer(options) {
         }
         // MCP endpoint
         if (url.pathname === '/mcp') {
-            // Check for existing session
-            const sessionId = req.headers['mcp-session-id'];
-            if (sessionId && transports.has(sessionId)) {
-                // Use existing transport
-                const transport = transports.get(sessionId);
-                try {
-                    const body = req.method === 'POST' ? await parseBody(req) : undefined;
-                    await transport.handleRequest(req, res, body);
-                }
-                catch (error) {
-                    logger.error('Error handling MCP request:', error);
-                    if (!res.headersSent) {
-                        res.writeHead(500, { 'Content-Type': 'application/json' });
-                        res.end(JSON.stringify({ error: 'Internal server error' }));
-                    }
-                }
-                return;
-            }
-            // Create new session for initialization requests
+            console.log(`[MCP] ${req.method} request`);
+            // Handle all POST and GET requests (stateless mode)
             if (req.method === 'POST' || req.method === 'GET') {
                 try {
-                    // Create new transport with session ID generator
-                    const transport = new StreamableHTTPServerTransport({
-                        sessionIdGenerator: () => randomUUID(),
-                    });
                     // Create MCP server for this session
                     const server = new Server({
                         name: options.config.serverName,
                         version: options.config.serverVersion,
                     }, {
                         capabilities: {
-                            tools: {},
+                            tools: {
+                                listChanged: true,
+                            },
                         },
                     });
                     // Register tools
                     registerTools(server, options.storage);
+                    // Create new transport
+                    // enableJsonResponse allows browser fetch() clients to receive JSON instead of SSE
+                    // Stateless mode (no sessionIdGenerator) - each request is independent
+                    const transport = new StreamableHTTPServerTransport({
+                        enableJsonResponse: true,
+                    });
                     // Connect server to transport
                     await server.connect(transport);
-                    // Track transport by session ID once we have it
-                    transport.onclose = () => {
-                        if (transport.sessionId) {
-                            transports.delete(transport.sessionId);
-                            logger.debug(`Session ${transport.sessionId} closed`);
-                        }
-                    };
                     // Handle the request
                     const body = req.method === 'POST' ? await parseBody(req) : undefined;
                     await transport.handleRequest(req, res, body);
-                    // Store transport after successful initialization
-                    if (transport.sessionId) {
-                        transports.set(transport.sessionId, transport);
-                        logger.info(`New session created: ${transport.sessionId}`);
-                    }
                 }
                 catch (error) {
                     logger.error('Error creating MCP session:', error);
@@ -150,12 +126,6 @@ export async function createHttpMcpServer(options) {
             });
         },
         close: async () => {
-            // Close all active transports
-            for (const [sessionId, transport] of transports) {
-                logger.debug(`Closing session ${sessionId}`);
-                await transport.close();
-            }
-            transports.clear();
             // Close HTTP server
             return new Promise((resolve, reject) => {
                 httpServer.close((err) => {
